@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Compõe o golden path a partir dos fragments do platform-app-base.
+# workload + metrics sempre (comum a qualquer microserviço); http e
+# availability entram conforme as escolhas feitas no scaffolder.
+components:
+  - https://github.com/TourinhoM/platform-app-base//components/workload?ref=main
+  - https://github.com/TourinhoM/platform-app-base//components/metrics?ref=main
+  - https://github.com/TourinhoM/platform-app-base//components/http?ref=main
+  - https://github.com/TourinhoM/platform-app-base//components/availability?ref=main
+
+resources:
+  - claims/appnamespace.yaml
+
+# Label em metadata e no pod template (não nos selectors imutáveis) para o
+# plugin Kubernetes do Backstage descobrir os workloads E os pods via kubernetes-id.
+labels:
+  - pairs:
+      backstage.io/kubernetes-id: teste-split
+    includeSelectors: false
+    includeTemplates: true
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - name=teste-split
+      - hostname=teste-split.local
+
+images:
+  - name: app-image
+    newName: ghcr.io/tourinho-labs/teste-split
+    newTag: latest

@@ -1,0 +1,9 @@
+apiVersion: platform.lab/v1alpha1
+kind: AppNamespace
+metadata:
+  name: teste-split
+  namespace: default
+spec:
+  teamName: teste-split
+  cpuLimit: "2"
+  memoryLimit: 2Gi
